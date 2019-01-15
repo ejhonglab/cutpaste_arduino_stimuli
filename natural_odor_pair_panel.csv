@@ -1,0 +1,11 @@
+odor_1,odor_2,reason
+3-methylbutyl acetate,3-methylbutan-1-ol,highest joint
+ethyl acetate,3-methylbutyl acetate,highest joint
+ethyl acetate,3-methylbutan-1-ol,highest joint
+3-methylbutyl acetate,ethanol,highest joint
+methyl acetate,propan-1-ol,unobserved w/ highest marginal product
+propyl acetate,butanoic acid,unobserved w/ highest marginal product
+propyl acetate,butanoic acid,lowest joint pairs of odors from pairs with highest joint
+methyl acetate,propan-1-ol,lowest joint pairs of odors from pairs with highest joint
+propan-1-ol,propyl acetate,lowest joint pairs of odors from pairs with highest joint
+methyl acetate,butanoic acid,lowest joint pairs of odors from pairs with highest joint
