@@ -92,8 +92,6 @@ def main():
 
     # TODO upload to database rather / in addition to pickle?
 
-    import ipdb; ipdb.set_trace()
-
 
 if __name__ == '__main__':
     main()
