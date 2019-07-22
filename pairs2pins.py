@@ -24,10 +24,29 @@ def main():
     # TODO first print anything duplicated (the different reasons...)
     df = orig_df.drop_duplicates(subset=['odor_1','odor_2'])
 
-    # TODO probably delete this hack after building in appropriate caching
-    # Set to None (not a string) to generate odor to pin mappings.
-    use_odors2pins_from = '20190117_104846_stimuli.p'
+    use_odors2pins_from = '20190503_101913_stimuli.p' #None
+    # Set this to True to just print the information in the file above, without
+    # generating a new trial order.
+    keep_saved_order = False
     save_stimuli_data = True
+    n_repeats = 3
+    
+    # Valid values for this:
+    # - 'across_repeats': n_repeats of each of odor {A,B,AB} are permuted
+    #
+    #    In this case, any odor could ocasionally occur three times in 
+    #    succession.
+    #
+    # - 'within_repeat': within each of the n_repeats of {A,B,AB}
+    #    An odor will never occur more than twice in succession.
+    # TODO TODO maybe randomly order all {a,b,ab} comparisons, so that repeats
+    # of one odor pair are arbitrarily separated?
+    randomize_within = 'within_repeat'
+    if randomize_within not in {'across_repeats', 'within_repeat'}:
+        raise ValueError('invalid value for randomize_within')
+    # TODO print line saying which we are doing / reformat output in 
+    # within_repeat case
+    
     
     if use_odors2pins_from is None:
         available_pins = list(range(2, 12))
@@ -65,30 +84,58 @@ def main():
         odors = old_stim_data['odors']        
         pins2odors = old_stim_data['pins2odors']
         odors2pins = old_stim_data['odors2pins']
-
-    n_repeats = 3
-
-    # TODO TODO probably work in some presentations of paraffin by itself
-    odor_pair_list = []
-    for block_num, pair in enumerate(df.sample(frac=1).itertuples()):
-        comparison_block_odors = [
-            (pair.odor_1, 'paraffin'),
-            (pair.odor_2, 'paraffin'),
-            (pair.odor_1, pair.odor_2)
-        ] * n_repeats
-
-        random.shuffle(comparison_block_odors)
-        odor_pair_list += comparison_block_odors
         
-    presentations_per_comparison_block = len(comparison_block_odors)
-
-    pin_pair_list = [(odors2pins[o1], odors2pins[o2])
-                     for o1, o2 in odor_pair_list]
+        if keep_saved_order:
+            print('Also using saved trial structure.')
+            odor_pair_list = old_stim_data['odor_pair_list']
+            pin_pair_list = old_stim_data['pin_pair_list']
+            save_stimuli_data = False
     
-    sec_per_trial = 60.0
+    
+    if use_odors2pins_from is None or not keep_saved_order:
+        # TODO TODO probably work in some presentations of paraffin by itself
+        odor_pair_list = []
+        for block_num, pair in enumerate(df.sample(frac=1).itertuples()):
+            if randomize_within == 'across_repeats':
+                comparison_block_odors = [
+                    (pair.odor_1, 'paraffin'),
+                    (pair.odor_2, 'paraffin'),
+                    (pair.odor_1, pair.odor_2)
+                ] * n_repeats
+        
+                random.shuffle(comparison_block_odors)
+                
+            elif randomize_within == 'within_repeat':
+                comparison_block_odors = []
+                for _ in range(n_repeats):
+                    comparison_repeat_odors = [
+                        (pair.odor_1, 'paraffin'),
+                        (pair.odor_2, 'paraffin'),
+                        (pair.odor_1, pair.odor_2)
+                    ]
+                    random.shuffle(comparison_repeat_odors)
+                    comparison_block_odors += comparison_repeat_odors
+                
+            odor_pair_list += comparison_block_odors
+            
+        presentations_per_comparison_block = len(comparison_block_odors)
+    
+        pin_pair_list = [(odors2pins[o1], odors2pins[o2])
+                         for o1, o2 in odor_pair_list]
+    
+    '''
+    before_first_odor_s = 5
+    odor_pulse_s = 1
+    between_trials_s = 45
+    between_blocks_s = 30
+    n_blocks = len(df)
+    sec_per_trial = odor_pulse_s + between_trials_s
+    total_time = before_first_odor_s + (n_blocks - 1) * between_blocks_s +
+    
     print('Number of trials: {}'.format(len(pin_pair_list)))
     print('Will take {} minutes'.format(len(pin_pair_list) * (sec_per_trial / 60.0)))
     #pp.pprint(pin_pair_list)
+    '''
 
     print('\nPins to odors:')
     for p in sorted(pins2odors.keys()):
@@ -102,7 +149,9 @@ def main():
         pin_separator = ','
         block_separator = '\n '
         for n, p in enumerate(pin_list):
-            if n % presentations_per_comparison_block == 0:
+            # TODO TODO fix hack in keep_saved_order case
+            if n % 9 == 0:
+            ####if n % presentations_per_comparison_block == 0:
                 s += block_separator
             s += str(p) + pin_separator
         s = s[:-(len(pin_separator))]
@@ -122,7 +171,11 @@ def main():
     if save_stimuli_data:
         pickle_name = time.strftime('%Y%m%d_%H%M%S') + '_stimuli.p'
         # TODO print full path
+        # TODO TODO either only save to dropbox / nas or at least copy
+        # to one / both of those places
         print('\nSaving stimulus data to {}'.format(pickle_name))
+        # TODO TODO maybe also include a git version of this code
+        # (+ unsaved changes?)
         with open(pickle_name, 'wb') as f:
             data = {
                 'pins2odors': pins2odors,
