@@ -18,13 +18,13 @@ def main():
     else:
         df = df[df['mix'] == 'kiwi approx.']
 
-    use_odors2pins_from = None #'20190503_101913_stimuli.p'
-    if use_odors2pins_from is None:
-        blocks_without_repeats = []
-        for gn, gdf in df.groupby('mix'):
-            blocks_without_repeats.append(list(gdf.odor_w_conc))
-    else:
-        blocks_without_repeats = None
+    use_odors2pins_from = '20190722_232951_stimuli.p'
+    #if use_odors2pins_from is None:
+    blocks_without_repeats = []
+    for gn, gdf in df.groupby('mix'):
+        blocks_without_repeats.append(list(gdf.odor_w_conc))
+    #else:
+    #    blocks_without_repeats = None
 
     randomizer.print_trial_structure(blocks_without_repeats,
         use_odors2pins_from=use_odors2pins_from,

@@ -40,9 +40,13 @@ def trial_structure(blocks_without_repeats=None, use_odors2pins_from=None,
 
     extra_data (dict): extra data to be pickled alongside trial structure.
     """
-    if blocks_without_repeats is None:
-        if use_odors2pins_from is None or not keep_saved_order:
+    if keep_saved_order:
+        if blocks_without_repeats is None:
             raise ValueError('must pass blocks_without_repeats if ' +
+                'not using saved order')
+
+        if use_odors2pins_from is None:
+            raise ValueError('must pass use_odors2pins_from if ' +
                 'not using saved order')
 
     # TODO option to randomize across all repeats and blocks?
@@ -88,6 +92,9 @@ def trial_structure(blocks_without_repeats=None, use_odors2pins_from=None,
         
         with open(use_odors2pins_from, 'rb') as f:
             old_stim_data = pickle.load(f)
+
+        if blocks_without_repeats is None:
+            blocks_without_repeats = old_stim_data['blocks_without_repeats']
 
         available_pins = old_stim_data['available_pins']
         odors = old_stim_data['odors']        
@@ -147,7 +154,8 @@ def trial_structure(blocks_without_repeats=None, use_odors2pins_from=None,
         # None if uneven length blocks. Includes presentations of all repeats of
         # a block.
         'presentations_per_block': presentations_per_block,
-        'randomize_within': randomize_within
+        'randomize_within': randomize_within,
+        'blocks_without_repeats': blocks_without_repeats
     }
     if save_stimuli_data:
         pickle_name = time.strftime('%Y%m%d_%H%M%S') + '_stimuli.p'
