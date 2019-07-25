@@ -12,6 +12,12 @@ import randomizer
 def main():
     df = pd.read_csv('complex_mixtures.csv')
 
+    control_mixture_this_time = False
+    if control_mixture_this_time:
+        df = df[df['mix'] == 'control mix 1']
+    else:
+        df = df[df['mix'] == 'kiwi approx.']
+
     use_odors2pins_from = None #'20190503_101913_stimuli.p'
     if use_odors2pins_from is None:
         blocks_without_repeats = []
