@@ -12,13 +12,21 @@ import randomizer
 def main():
     df = pd.read_csv('complex_mixtures.csv')
 
-    control_mixture_this_time = False
-    if control_mixture_this_time:
-        df = df[df['mix'] == 'control mix 1']
-    else:
-        df = df[df['mix'] == 'kiwi approx.']
-
-    use_odors2pins_from = '20190722_232951_stimuli.p'
+    # TODO update so fly food approx also has real thing and that also goes
+    # in hardcoded_pins2odors
+    panel = 'fly food approx.'
+    assert panel in ('kiwi approx.', 'control mix 2', 'fly food approx.')
+    df = df[df['mix'] == panel]
+    hardcoded_pins2odors = None
+    if panel == 'kiwi approx.':
+        real_kiwi = 'd3 kiwi @ 0.0'
+        assert (real_kiwi == df.odor_w_conc).any()
+        hardcoded_pins2odors = {11: real_kiwi}
+        
+    
+    # TODO maybe implement a True/'last' flag to justs load to most recent one
+    # (or last w/in day? some time limit?)
+    use_odors2pins_from = None
     #if use_odors2pins_from is None:
     blocks_without_repeats = []
     for gn, gdf in df.groupby('mix'):
@@ -32,7 +40,9 @@ def main():
         # without generating a new trial order.
         keep_saved_order=False,
         save_stimuli_data=True,
+        stop_pin=10,
         n_repeats=3,
+        hardcoded_pins2odors=hardcoded_pins2odors,
         extra_data={'input_mix_df': df}
     )
         

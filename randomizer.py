@@ -10,18 +10,15 @@ from __future__ import division
 
 from os.path import abspath
 import random
-from pprint import pprint as pp
 import time
 import pickle
 import warnings
-
-import pandas as pd
 
 
 def trial_structure(blocks_without_repeats=None, use_odors2pins_from=None,
     keep_saved_order=False, save_stimuli_data=True, n_repeats=3,
     randomize_within='within_repeat', available_pins=None, exclude_pins=(7,),
-    start_pin=2, stop_pin=11, extra_data=None):
+    start_pin=2, stop_pin=11, hardcoded_pins2odors=None, extra_data=None):
     """
     Args:
     blocks_without_repeats (list of lists): Each contained list is one repeat of
@@ -74,6 +71,15 @@ def trial_structure(blocks_without_repeats=None, use_odors2pins_from=None,
                         odors.add(odor)
                 else:
                     odors.add(stim)
+        
+        if hardcoded_pins2odors is not None:
+            for p, o in hardcoded_pins2odors.items():
+                if o in odors:
+                    odors.remove(o)
+                    
+                if p in available_pins:
+                    available_pins.remove(p)
+            
         odors = list(odors)
     
         if len(odors) > len(available_pins):
@@ -86,6 +92,12 @@ def trial_structure(blocks_without_repeats=None, use_odors2pins_from=None,
 
         pins2odors = dict(zip(available_pins, odors))
         odors2pins = dict(zip(odors, available_pins))
+        
+        if hardcoded_pins2odors is not None:
+            for p, o in hardcoded_pins2odors.items():
+                pins2odors[p] = o
+                odors2pins[o] = p
+                
     else:
         print('Using pin to odor mapping from: {}'.format(
             use_odors2pins_from))

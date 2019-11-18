@@ -5,9 +5,19 @@ isoamyl alcohol @ -3.6,kiwi approx.
 isoamyl acetate @ -3.7,kiwi approx.
 kiwi approx.,kiwi approx.
 ethanol @ -2.0,kiwi approx.
-1-octen-3-ol @ -3,control mix 1
-furfural @ -4,control mix 1
-valeric acid @ -3,control mix 1
-methyl salicylate @ -3,control mix 1
-2-heptanone @ -4,control mix 1
-control mix 1,control mix 1
+pfo @ 0.0,kiwi approx.
+d3 kiwi @ 0.0,kiwi approx.
+1-octen-3-ol @ -3,control mix 2
+furfural @ -4,control mix 2
+valeric acid @ -3,control mix 2
+methyl salicylate @ -3,control mix 2
+2-heptanone @ -5,control mix 2
+control mix 2,control mix 2
+pfo @ 0.0,control mix 2
+water @ 0.0,fly food approx.
+isobutyric acid @ -3.7,fly food approx.
+acetic acid @ -1.99,fly food approx.
+propanoic acid @ -1.9,fly food approx.
+acetoin @ -2.17,fly food approx.
+ethanol @ -3.3,fly food approx.
+fly food approx.,fly food approx.
