@@ -10,12 +10,18 @@ import randomizer
 
 
 def main():
+    # TODO also encode whether or not something needs to be undiluted in
+    # another column in this
     df = pd.read_csv('complex_mixtures.csv')
 
-    # TODO update so fly food approx also has real thing and that also goes
-    # in hardcoded_pins2odors
-    panel = 'fly food approx.'
-    assert panel in ('kiwi approx.', 'control mix 2', 'fly food approx.')
+    panel_idx = 0
+    panels = [
+        'kiwi approx.',
+        'control mix 2',
+        'fly food approx.'
+    ]
+    panel = panels[panel_idx]
+    # TODO assert in df
     df = df[df['mix'] == panel]
     hardcoded_pins2odors = None
     if panel == 'kiwi approx.':
@@ -23,6 +29,10 @@ def main():
         assert (real_kiwi == df.odor_w_conc).any()
         hardcoded_pins2odors = {11: real_kiwi}
         
+    elif panel == 'fly food approx.':
+        real_ff_b = 'fly food b @ 0.0'
+        assert (real_ff_b == df.odor_w_conc).any()
+        hardcoded_pins2odors = {11: real_ff_b}
     
     # TODO maybe implement a True/'last' flag to justs load to most recent one
     # (or last w/in day? some time limit?)

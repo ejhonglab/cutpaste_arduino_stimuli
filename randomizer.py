@@ -255,9 +255,24 @@ def print_trial_structure(blocks_without_repeats, **kwargs):
         print(' {}: {}'.format(p, pins2odors[p]))
 
     print('\nCopy to Arduino script, replacing existing:')
+    # TODO fix. this is > desired value (it's odors_per_block * desired)
+    block_num = len(pin_lists)
+    print(f'const int block_num = {block_num};')
+    
+    
+    '''
+    unique_pinlist_lens = {len(pl) for all_channel_pls in pin_lists
+        for pl in all_channel_pls
+    }
+    assert len(unique_pinlist_lens) == 1
+    odors_per_block = unique_pinlist_lens.pop()
+    print(f'const int odors_per_block = {odors_per_block};')
+    '''
+        
     for i in range(n_channels):
         channel = chr(ord('A') + i)
         pins = [pl[i] for pl in pin_lists]
-        print_as_array(pins, channel='A', n_repeats=n_repeats,
-            presentations_per_block=presentations_per_block)
+        print_as_array(pins, channel=channel, n_repeats=n_repeats,
+            presentations_per_block=presentations_per_block
+        )
 
