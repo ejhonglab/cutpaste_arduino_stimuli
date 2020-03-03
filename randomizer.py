@@ -16,7 +16,8 @@ import warnings
 
 
 def trial_structure(blocks_without_repeats=None, use_odors2pins_from=None,
-    keep_saved_order=False, save_stimuli_data=True, n_repeats=3,
+    keep_saved_order=False, save_stimuli_data=True,
+    extra_pickle_fname_part=None, n_repeats=3,
     randomize_within='within_repeat', available_pins=None, exclude_pins=(7,),
     start_pin=2, stop_pin=11, hardcoded_pins2odors=None, extra_data=None):
     """
@@ -170,7 +171,12 @@ def trial_structure(blocks_without_repeats=None, use_odors2pins_from=None,
         'blocks_without_repeats': blocks_without_repeats
     }
     if save_stimuli_data:
-        pickle_name = time.strftime('%Y%m%d_%H%M%S') + '_stimuli.p'
+        pickle_name_parts = [time.strftime('%Y%m%d_%H%M%S')]
+        if extra_pickle_fname_part is not None:
+            pickle_name_parts.append(extra_pickle_fname_part)
+        pickle_name_parts.append('stimuli.p')
+        pickle_name = '_'.join(pickle_name_parts)
+
         # TODO TODO either only save to dropbox / nas or at least copy
         # to one / both of those places
         print('Saving stimulus data to {}\n'.format(abspath(pickle_name)))
@@ -221,6 +227,10 @@ def print_as_array(pin_list, channel=None, presentations_per_block=None,
 
 
 def print_trial_structure(blocks_without_repeats, **kwargs):
+    print_available_pins = True
+    if 'print_available_pins' in kwargs:
+        print_available_pins = kwargs.pop('print_available_pins')
+
     data = trial_structure(blocks_without_repeats, **kwargs)
 
     available_pins = sorted(data['available_pins'])
@@ -249,16 +259,29 @@ def print_trial_structure(blocks_without_repeats, **kwargs):
         (sec_per_trial / 60.0)))
     #pp(pin_lists)
     '''
-    print('Available pins: {}'.format(available_pins))
-    print('\nPins to odors:')
+    if print_available_pins:
+        print('Available pins: {}\n'.format(available_pins))
+
+    print('Pins to odors:')
     for p in sorted(pins2odors.keys()):
         print(' {}: {}'.format(p, pins2odors[p]))
 
     print('\nCopy to Arduino script, replacing existing:')
-    # TODO fix. this is > desired value (it's odors_per_block * desired)
-    block_num = len(pin_lists)
+
+    # TODO TODO test the fix doesn't break anything in pairs.py
+    # (or less likely complex_mixtures.py)
+
+    # Note that this block num may conflict w/ that implied by
+    # "presentations_per_block", but I think it more in line w/ my
+    # usual definition of block (i.e. a continuos period of acquisition).
+    # I my definitions for this may have changed between the pair and
+    # complex_mixture experiments (analysis had to special case block handling
+    # for each)
+    block_num = n_repeats
     print(f'const int block_num = {block_num};')
-    
+    odors_per_block, remainder = divmod(len(pin_lists), block_num)
+    assert remainder == 0
+    print(f'const int odors_per_block = {odors_per_block};')
     
     '''
     unique_pinlist_lens = {len(pl) for all_channel_pls in pin_lists
