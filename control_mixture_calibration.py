@@ -19,12 +19,19 @@ import randomizer
 
 
 def main():
-    control_mix_num = 2
-    solvent = 'water'
+    control_mix_num = 1
     start_log10_conc = -5
     stop_log10_conc = -3
     include_landmark_odors = True
     only_dhruvs_landmark_odors = True
+
+    if control_mix_num == 1:
+        solvent = 'pfo'
+    elif control_mix_num == 2:
+        # TODO maybe also use pfo in mix 2 case
+        solvent = 'water'
+    else:
+        raise ValueError
 
     assert start_log10_conc <= stop_log10_conc
 
