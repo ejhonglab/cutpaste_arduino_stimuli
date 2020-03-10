@@ -1,10 +1,12 @@
 
-const float odor_pulse_s = 1;
 const float before_odor_s = 10;
+const float odor_pulse_s = 1;
 const float after_odor_s = 45;
 // TODO should this also be a float?
 const int between_block_s = 30;
 
+// TODO maybe actually use this (half of it?) to delay before / after flipping
+// mirror? (now only used to subtract from between_block_s)
 const unsigned long mirror_delay_ms = 1000;  //padding time for flipper mirror in milliseconds
 
 // pin and odor assignments
@@ -31,8 +33,6 @@ const int channelA[] = {
  9,6,8,5,4,3,10, 3,4,10,9,5,6,8, 6,10,3,4,5,9,8
 };
 
-
-const float total_block_s = odors_per_block * (odor_pulse_s + after_odor_s) + before_odor_s;
 
 const int base = sizeof(channelA) / sizeof(int);
 

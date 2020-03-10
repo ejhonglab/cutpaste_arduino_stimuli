@@ -245,20 +245,6 @@ def print_trial_structure(blocks_without_repeats, **kwargs):
         'varying pin list lengths')
     n_channels = pin_list_lengths.pop()
 
-    '''
-    before_first_odor_s = 5
-    odor_pulse_s = 1
-    between_trials_s = 45
-    between_blocks_s = 30
-    n_blocks = len(df)
-    sec_per_trial = odor_pulse_s + between_trials_s
-    total_time = before_first_odor_s + (n_blocks - 1) * between_blocks_s +
-    
-    print('Number of trials: {}'.format(len(pin_lists)))
-    print('Will take {} minutes'.format(len(pin_lists) *
-        (sec_per_trial / 60.0)))
-    #pp(pin_lists)
-    '''
     if print_available_pins:
         print('Available pins: {}\n'.format(available_pins))
 
@@ -283,6 +269,7 @@ def print_trial_structure(blocks_without_repeats, **kwargs):
     assert remainder == 0
     print(f'const int odors_per_block = {odors_per_block};')
     
+    # TODO probably delete this
     '''
     unique_pinlist_lens = {len(pl) for all_channel_pls in pin_lists
         for pl in all_channel_pls
@@ -298,4 +285,29 @@ def print_trial_structure(blocks_without_repeats, **kwargs):
         print_as_array(pins, channel=channel, n_repeats=n_repeats,
             presentations_per_block=presentations_per_block
         )
+
+    # from delay(5 * 1000) in setup
+    extra_constant_s = 5
+
+    # TODO maybe parse these from current arduino script?
+    # (if not explicitly passed?)
+    ############################################################################
+    # These correspond to variables in my Arduino script (same names).
+    ############################################################################
+    # This one only applies to first pulse, so it's only added per block, not
+    # per odor presentation.
+    before_odor_s = 10
+    odor_pulse_s = 1
+    after_odor_s = 45
+    between_block_s = 30
+    ############################################################################
+
+    total_block_s = \
+        odors_per_block * (odor_pulse_s + after_odor_s) + before_odor_s
+
+    total_s = ((block_num - 1) * between_block_s + block_num * total_block_s +
+        extra_constant_s
+    )
+    total_m = total_s / 60.0
+    print(f'\nWill take {total_m:.1f} minutes')
 
