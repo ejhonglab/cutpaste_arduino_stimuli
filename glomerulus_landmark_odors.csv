@@ -1,11 +1,11 @@
 odor_w_conc,glomerulus,dhruv_has
-geosmin @ -1,DA2,False
 trans-2-hexenal @ -6,DL5,True
-phenyl-acetaldehyde @ -5,VL2a,False
-methyl acetate @ -5,DM4,False
 ammonia @ -1,VM1,True
 '2,3-butanedione @ -6',VA2,True
 ethyl acetate @ -8,DM1,True
 2-butanone @ -6,VM7,True
-geranyl acetate @ -5,VA6,False
 methyl salicylate @ -4,DL1,True
+geosmin @ -1,DA2,False
+phenyl-acetaldehyde @ -5,VL2a,False
+methyl acetate @ -5,DM4,False
+geranyl acetate @ -5,VA6,False

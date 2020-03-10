@@ -34,10 +34,24 @@ def main():
         raise ValueError
 
     assert start_log10_conc <= stop_log10_conc
+    # (also equals the number of separate recordings that need to be done)
+    n_concs = abs(start_log10_conc - stop_log10_conc) + 1
 
     orig_df = pd.read_csv('control_mixture_odors.csv')
     assert control_mix_num in orig_df.mix
     df = orig_df[orig_df.mix == control_mix_num]
+
+    recording_odor_w_conc_list = []
+    odor_w_conc_set = set()
+    for i, log10_vv_conc in enumerate(
+        range(start_log10_conc, stop_log10_conc + 1)):
+
+        odor_w_conc = [f'{o} @ {log10_vv_conc}' for o in df.odor]
+        odor_w_conc.append(f'{solvent} @ 0')
+        recording_odor_w_conc_list.append(odor_w_conc)
+
+        for owc in odor_w_conc:
+            odor_w_conc_set.add(owc)
 
     # TODO TODO maybe split up a fixed set of landmark private odors across all
     # three concentration recordings, using up to max number of channels
@@ -49,14 +63,22 @@ def main():
         if only_dhruvs_landmark_odors:
             mdf = mdf[mdf.dhruv_has].copy()
 
+        # TODO may want to assert / convert any float representations of conc to
+        # int, so string equality check (for set membership) can be used.
+        # (though currently, all strings in CSV *do* have the int repr)
+        landmarks_already_covered = mdf.odor_w_conc.isin(odor_w_conc_set)
+        if landmarks_already_covered.any():
+            print(landmarks_already_covered.sum(), 'landmark odor(s) will '
+                'already be presented as part of calibration curves.\n'
+            )
+            mdf = mdf[~ landmarks_already_covered]
+
         landmark_odor2glomerulus = dict(zip(mdf.odor_w_conc, mdf.glomerulus))
 
         # If stop_pin stays at 10 and nothing else changes this is true.
         # If I increase stop_pin, this should increase by the same amount.
         n_available_pins = 8
 
-        # (also equals the number of separate recordings that need to be done)
-        n_concs = abs(start_log10_conc - stop_log10_conc) + 1
         # + 1 b/c solvent
         # (# remaining in each recording)
         n_remaining_pins = n_available_pins - (len(df.odor) + 1)
@@ -71,11 +93,12 @@ def main():
         # TODO maybe subset further based on which ones i currently have
         # available too (or just change csv?)
 
+    assert len(recording_odor_w_conc_list) == n_concs
+
     for i, log10_vv_conc in enumerate(
         range(start_log10_conc, stop_log10_conc + 1)):
 
-        odor_w_conc = [f'{o} @ {log10_vv_conc}' for o in df.odor]
-        odor_w_conc.append(f'{solvent} @ 0')
+        odor_w_conc = recording_odor_w_conc_list[i]
 
         # May currently fail in case where n_landmark_odors is strictly
         # less than n_concs * n_remaining_pins...
